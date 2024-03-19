@@ -1,17 +1,18 @@
 {
    "name": "marketplace-backend",
    "version": "0.0.1",
-   "description": "Awesome project developed with TypeORM.",
+   "description": "",
    "type": "commonjs",
    "devDependencies": {
-      "ts-node": "10.9.1",
       "@types/node": "^16.11.10",
+      "ts-node": "10.9.1",
       "typescript": "4.5.2"
    },
    "dependencies": {
-      "typeorm": "0.3.20",
+      "dotenv": "^16.4.5",
+      "pg": "^8.4.0",
       "reflect-metadata": "^0.1.13",
-      "pg": "^8.4.0"
+      "typeorm": "0.3.20"
    },
    "scripts": {
       "start": "ts-node src/index.ts",
