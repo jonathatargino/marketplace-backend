@@ -2,6 +2,7 @@ import 'dotenv/config'
 
 import { AppDataSource } from "./data-source"
 import { User } from "./entity/User"
+import * as express from "express"
 
 AppDataSource.initialize().then(async () => {
 
@@ -17,6 +18,18 @@ AppDataSource.initialize().then(async () => {
     const users = await AppDataSource.manager.find(User)
     console.log("Loaded users: ", users)
 
-    console.log("Here you can setup and run express / fastify / any other framework.")
+    const app = express()
+
+    app.get("/", (req, res) => {
+        res.send("Hello World!")
+    })
+
+    app.get("/users", async (req, res) => {
+        const users = await AppDataSource.manager.find(User)
+        res.json(users)
+    })
+
+    app.listen(process.env.APP_PORT, () => console.log(`Server running at ${process.env.APP_PORT}`))
 
 }).catch(error => console.log(error))
+
