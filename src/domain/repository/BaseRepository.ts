@@ -1,5 +1,5 @@
 export interface BaseRepository<T> {
-  findAll: () => T[];
-  findById: (id: string) => T;
-  save: (entity: T) => T;
+  findAll: () => Promise<T[]>;
+  findById: (id: string) => Promise<T>;
+  save: (entity: T) => Promise<T>;
 }
