@@ -1,11 +1,11 @@
 import "dotenv/config";
-import { AppDataSource } from "./data-source";
+import { AppDataSource } from "./infra/database/config/data-source";
 import * as express from "express";
 
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("aaa");
+  res.send("Hello World!");
 });
 
 AppDataSource.initialize()
