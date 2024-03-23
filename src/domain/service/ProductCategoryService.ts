@@ -1,6 +1,6 @@
 import ProductCategoryCreate from "../../application/dto/ProductCategory/ProductCategoryCreate";
 import ProductCategory from "../entity/ProductCategory";
-import { HttpError } from "../exception/HttpError";
+import { HttpError } from "../error/HttpError";
 import { ProductCategoryRepository } from "../repository/ProductCategoryRepository";
 
 export default class ProductCategoryService {
