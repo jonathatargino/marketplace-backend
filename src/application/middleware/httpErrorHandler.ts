@@ -6,5 +6,5 @@ export default function httpErrorHandler(error: Error, req: Request, res: Respon
     res.status((error as HttpError).statusCode).send({ message: error.message });
   }
 
-  next();
+  next(error);
 }

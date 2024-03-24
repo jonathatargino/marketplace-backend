@@ -1,7 +1,6 @@
-export class ProductCategoryRseponse {
+export class ProductCategoryResponse {
   constructor(
     public id: string,
-    public createdDate: Date,
     public name: string,
   ) {}
 }
