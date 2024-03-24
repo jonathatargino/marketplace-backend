@@ -12,5 +12,9 @@ const productCategoryController = new ProductCategoryController(
 );
 
 router.get("/productCategory", (req, res) => productCategoryController.findAll(req, res));
+router.get("/productCategory/:id", (req, res) => productCategoryController.findById(req, res));
+router.post("/productCategory", (req, res) => productCategoryController.create(req, res));
+router.put("/productCategory/:id", (req, res) => productCategoryController.update(req, res));
+router.delete("/productCategory/:id", (req, res) => productCategoryController.delete(req, res));
 
 export default router;

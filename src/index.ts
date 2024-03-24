@@ -1,18 +1,22 @@
 import "dotenv/config";
+import "express-async-errors";
 import { AppDataSource } from "./infra/database/config/data-source";
 import * as express from "express";
 import router from "./application/route/productCategory";
-
-const app = express();
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.use(router);
+import httpErrorHandler from "./application/middleware/httpErrorHandler";
 
 AppDataSource.initialize()
   .then(async () => {
+    const app = express();
+
+    app.use(express.json());
+
+    app.get("/", (req, res) => {
+      res.send("Hello World!");
+    });
+
+    app.use(router);
+    app.use(httpErrorHandler);
     app.listen(process.env.APP_PORT, () => {
       console.log(`Server running at ${process.env.APP_PORT}`);
     });

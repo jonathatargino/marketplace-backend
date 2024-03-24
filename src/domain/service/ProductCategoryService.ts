@@ -2,16 +2,21 @@ import ProductCategoryCreate from "../../application/dto/ProductCategory/Product
 import ProductCategory from "../entity/ProductCategory";
 import { HttpError } from "../error/HttpError";
 import { ProductCategoryRepository } from "../repository/ProductCategoryRepository";
+import { validate as uuidValidate } from "uuid";
 
 export default class ProductCategoryService {
   constructor(private readonly productCategoryRepository: ProductCategoryRepository) {}
 
   async findAll() {
-    return this.productCategoryRepository.findAll();
+    return await this.productCategoryRepository.findAll();
   }
 
   async findById(id: string) {
-    const productCategory = this.productCategoryRepository.findById(id);
+    if (!uuidValidate(id)) {
+      throw new HttpError(404, "Categoria de produto não encontrada");
+    }
+
+    const productCategory = await this.productCategoryRepository.findById(id);
 
     if (!productCategory) {
       throw new HttpError(404, "Categoria de produto não encontrada");
@@ -21,26 +26,30 @@ export default class ProductCategoryService {
   }
 
   async create(productCategoryDTO: ProductCategoryCreate) {
-    if (!this.productCategoryRepository.findByName(productCategoryDTO.name)) {
+    const productCategoryUsingReceivedName = await this.productCategoryRepository.findByName(productCategoryDTO.name);
+
+    if (productCategoryUsingReceivedName !== null) {
       throw new HttpError(400, "Já existe uma categoria de produto utilizando este nome");
     }
 
     const productCategoryEntity = new ProductCategory();
     productCategoryEntity.name = productCategoryDTO.name;
-    return this.productCategoryRepository.save(productCategoryEntity);
+    return await this.productCategoryRepository.save(productCategoryEntity);
   }
 
   async update(id: string, productCategoryDTO: ProductCategoryCreate) {
     const productCategoryEntity = await this.findById(id);
     productCategoryEntity.name = productCategoryDTO.name;
-    return this.productCategoryRepository.save(productCategoryEntity);
+    return await this.productCategoryRepository.save(productCategoryEntity);
   }
 
-  delete(id: string) {
-    if (!this.productCategoryRepository.findById(id)) {
+  async delete(id: string) {
+    const productCategory = await this.productCategoryRepository.findById(id);
+
+    if (!productCategory) {
       throw new HttpError(404, "Categoria de produto não encontrada");
     }
 
-    return this.productCategoryRepository.delete(id);
+    return await this.productCategoryRepository.delete(id);
   }
 }
