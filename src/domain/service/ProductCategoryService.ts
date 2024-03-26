@@ -2,27 +2,29 @@ import ProductCategoryCreate from "../../application/dto/ProductCategory/Product
 import ProductCategory from "../entity/ProductCategory";
 import { HttpError } from "../error/HttpError";
 import { ProductCategoryRepository } from "../repository/ProductCategoryRepository";
-import { validate as uuidValidate } from "uuid";
+import { ProductCategoryResponse } from "../../application/dto/ProductCategory/ProductCategoryResponse";
 
 export default class ProductCategoryService {
   constructor(private readonly productCategoryRepository: ProductCategoryRepository) {}
 
   async findAll() {
-    return await this.productCategoryRepository.findAll();
+    const productCategories = await this.productCategoryRepository.findAll();
+    const productCategoryResponseDTOs = productCategories.map(
+      (productCategory) => new ProductCategoryResponse(productCategory.id, productCategory.name),
+    );
+
+    return productCategoryResponseDTOs;
   }
 
   async findById(id: string) {
-    if (!uuidValidate(id)) {
-      throw new HttpError(404, "Categoria de produto não encontrada");
-    }
-
     const productCategory = await this.productCategoryRepository.findById(id);
 
     if (!productCategory) {
       throw new HttpError(404, "Categoria de produto não encontrada");
     }
 
-    return productCategory;
+    const productCategoryResponseDTO = new ProductCategoryResponse(productCategory.id, productCategory.name);
+    return productCategoryResponseDTO;
   }
 
   async create(productCategoryDTO: ProductCategoryCreate) {
@@ -34,13 +36,26 @@ export default class ProductCategoryService {
 
     const productCategoryEntity = new ProductCategory();
     productCategoryEntity.name = productCategoryDTO.name;
-    return await this.productCategoryRepository.save(productCategoryEntity);
+
+    const createdProductCategory = await this.productCategoryRepository.save(productCategoryEntity);
+
+    const productCategoryResponseDTO = new ProductCategoryResponse(
+      createdProductCategory.id,
+      createdProductCategory.name,
+    );
+
+    return productCategoryResponseDTO;
   }
 
   async update(id: string, productCategoryDTO: ProductCategoryCreate) {
-    const productCategoryEntity = await this.findById(id);
-    productCategoryEntity.name = productCategoryDTO.name;
-    return await this.productCategoryRepository.save(productCategoryEntity);
+    const productCategory = await this.productCategoryRepository.findById(id);
+
+    if (!productCategory) {
+      throw new HttpError(404, "Categoria de produto não encontrada");
+    }
+
+    productCategory.name = productCategoryDTO.name;
+    return await this.productCategoryRepository.save(productCategory);
   }
 
   async delete(id: string) {

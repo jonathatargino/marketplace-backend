@@ -1,24 +1,26 @@
 import { Request, Response } from "express";
 import ProductCategoryService from "../../domain/service/ProductCategoryService";
 import ProductCategoryCreate from "../dto/ProductCategory/ProductCategoryCreate";
-import { ProductCategoryResponse } from "../dto/ProductCategory/ProductCategoryResponse";
 import validateDTO from "../../infra/utils/validateDTO";
+import { HttpError } from "../../domain/error/HttpError";
+import { validate as uuidValidate } from "uuid";
 
 export default class ProductCategoryController {
   constructor(private readonly productCategoryService: ProductCategoryService) {}
 
   async findAll(req: Request, res: Response) {
-    const productCategories = await this.productCategoryService.findAll();
-    const productCategoryResponseDTOS = productCategories.map(
-      (productCategory) => new ProductCategoryResponse(productCategory.id, productCategory.name),
-    );
-    res.send(productCategoryResponseDTOS);
+    res.send(await this.productCategoryService.findAll());
   }
 
   async findById(req: Request, res: Response) {
-    const productCategory = await this.productCategoryService.findById(req.params.id);
-    const productCategoryResponseDTO = new ProductCategoryResponse(productCategory.id, productCategory.name);
-    res.send(productCategoryResponseDTO);
+    const { id } = req.params;
+
+    if (!uuidValidate(id)) {
+      throw new HttpError(404, "Categoria de produto não encontrada");
+    }
+
+    const productCategory = await this.productCategoryService.findById(id);
+    res.send(productCategory);
   }
 
   async create(req: Request, res: Response) {
@@ -28,29 +30,34 @@ export default class ProductCategoryController {
     await validateDTO(productCategoryDTO);
 
     const createdProductCategory = await this.productCategoryService.create(productCategoryDTO);
-    const productCategoryResponseDTO = new ProductCategoryResponse(
-      createdProductCategory.id,
-      createdProductCategory.name,
-    );
-    res.status(201).send(productCategoryResponseDTO);
+    res.status(201).send(createdProductCategory);
   }
 
   async update(req: Request, res: Response) {
+    const { id } = req.params;
+
+    if (!uuidValidate(id)) {
+      throw new HttpError(404, "Categoria de produto não encontrada");
+    }
+
     const productCategoryDTO = new ProductCategoryCreate();
     productCategoryDTO.name = req.body.name;
 
     await validateDTO(productCategoryDTO);
 
-    const updatedProductCategory = await this.productCategoryService.update(req.params.id, productCategoryDTO);
-    const productCategoryResponseDTO = new ProductCategoryResponse(
-      updatedProductCategory.id,
-      updatedProductCategory.name,
-    );
-    res.send(productCategoryResponseDTO);
+    const updatedProductCategory = await this.productCategoryService.update(id, productCategoryDTO);
+
+    res.send(updatedProductCategory);
   }
 
   async delete(req: Request, res: Response) {
-    await this.productCategoryService.delete(req.params.id);
+    const { id } = req.params;
+
+    if (!uuidValidate(id)) {
+      throw new HttpError(404, "Categoria de produto não encontrada");
+    }
+
+    await this.productCategoryService.delete(id);
     res.sendStatus(204);
   }
 }
