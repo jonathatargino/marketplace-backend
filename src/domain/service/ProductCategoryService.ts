@@ -3,12 +3,13 @@ import ProductCategory from "../entity/ProductCategory";
 import { HttpError } from "../error/HttpError";
 import { ProductCategoryRepository } from "../repository/ProductCategoryRepository";
 import { ProductCategoryResponse } from "../../application/dto/ProductCategory/ProductCategoryResponse";
+import Params from "../../application/dto/Params";
 
 export default class ProductCategoryService {
   constructor(private readonly productCategoryRepository: ProductCategoryRepository) {}
 
-  async findAll() {
-    const productCategories = await this.productCategoryRepository.findAll();
+  async findAll(params: Params) {
+    const productCategories = await this.productCategoryRepository.findAll(params);
     const productCategoryResponseDTOs = productCategories.map(
       (productCategory) => new ProductCategoryResponse(productCategory.id, productCategory.name),
     );

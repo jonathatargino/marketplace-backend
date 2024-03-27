@@ -1,3 +1,4 @@
+import Params from "../../application/dto/Params";
 import ProductCategory from "../../domain/entity/ProductCategory";
 import { ProductCategoryRepository } from "../../domain/repository/ProductCategoryRepository";
 import { Repository } from "typeorm";
@@ -5,8 +6,12 @@ import { Repository } from "typeorm";
 export default class ProductCategoryRepositoryImpl implements ProductCategoryRepository {
   constructor(private readonly typeOrmRepository: Repository<ProductCategory>) {}
 
-  async findAll() {
-    return await this.typeOrmRepository.find();
+  async findAll(params: Params) {
+    return await this.typeOrmRepository.find({
+      order: { name: params.order },
+      skip: Number(params.page) * Number(params.page_size),
+      take: Number(params.page_size),
+    });
   }
 
   async findById(id: string) {
